@@ -13,7 +13,7 @@ if (!admin.apps.length) {
   );
   admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://mayikh-default-rtdb.firebaseio.com",
+    databaseURL: `${process.env.PUBLIC_URL_BD}`,
   });
 }
 
@@ -33,23 +33,27 @@ app.post("/api/create_preference", async (req, res) => {
     if (!idOrder || !Array.isArray(items)) {
       return res.status(400).json({ error: "Datos inválidos" });
     }
+    
+    const mappedItems = items.map((item) => ({
+      title: item.nameP,
+      description: item.descriptionCar,
+      unit_price: Number(item.price),
+      quantity: Number(item.amount),
+      picture_url: item.urlP,
+      currency_id: "PEN",
+    }));
 
     const preference = {
-      items: items.map((item) => ({
-        title: item.nameP,
-        description: item.descriptionCar,
-        unit_price: Number(item.price),
-        quantity: Number(item.amount),
-        currency_id: "PEN",
-      })),
+      items: mappedItems,
       external_reference: idOrder,
       payer: { email: userEmail || "cliente@mayikh.com" },
       back_urls: {
-        success: "https://mayikh.vercel.app/checkout/success",
-        failure: "https://mayikh.vercel.app/checkout/failure",
+        success: `${process.env.PUBLIC_URL_SUCCESS}`,
+        failure: `${process.env.PUBLIC_URL_FAILURE}`,
+        pending: `${process.env.PUBLIC_URL_PENDING}`,
       },
       auto_return: "approved",
-      notification_url: "https://mayikh-back.vercel.app/api/webhook",
+      notification_url: `${process.env.PUBLIC_URL_WEBHOOK}`,
     };
 
     const response = await mercadopago.preferences.create(preference);
