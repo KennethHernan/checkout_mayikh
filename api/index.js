@@ -3,6 +3,9 @@ const mercadopago = require('mercadopago');
 const cors = require('cors');
 const app = express();
 const admin = require('firebase-admin');
+const dotenv = require('dotenv');
+
+dotenv.config();
 
 app.use(cors());
 app.use(express.json());
@@ -94,4 +97,8 @@ app.post("/api/webhook", async (req, res) => {
   }
 });
 
-export default app;
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});
+
+module.exports = app;
