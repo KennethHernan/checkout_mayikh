@@ -24,6 +24,7 @@ const db = admin.firestore();
 mercadopago.configure({
   access_token: process.env.MP_ACCESS_TOKEN,
 });
+
 app.get("/api", (req, res) => {
     res.json({
         message: "Bienvenido al servicio Mayikh Style"
@@ -69,22 +70,35 @@ app.post("/api/create_preference", async (req, res) => {
   }
 });
 
-app.post("/api/webhook", async (req, res) => {
+app.post("/api/webhook", express.raw({ type: 'application/json' }), async (req, res) => {
   try {
-    console.log("Headers recibidos:", req.headers);
-    const { type, data } = req.body;
-    if (type !== "payment" || !data.id) return res.sendStatus(200);
+    const parsedBody = JSON.parse(req.body);
+    const { type, data } = parsedBody;
 
-    const payment = await mercadopago.payment.findById(data.id);
-    const info = payment.body;
+    if (type !== "payment" || !data.id || isNaN(Number(data.id))) {
+      console.warn("Evento ignorado o ID inválido");
+      return res.sendStatus(200);
+    }
 
-    const orderRef = db.collection("orders").doc(info.external_reference);
+    let payment;
+    try {
+      const result = await mercadopago.payment.findById(data.id);
+      payment = result.body;
+    } catch (err) {
+      console.warn("No se encontró el pago con ID:", data.id);
+      return res.status(200).send("Pago no encontrado, ignorado");
+    }
+
+    // IdOrder
+    const idOrder = payment.external_reference;
+
+    const orderRef = db.collection("orders").doc(payment.external_reference);
     await orderRef.set(
       {
-        status: info.status,
-        paymentId: info.id,
-        payer: info.payer.email,
-        amount: info.transaction_amount,
+        status: payment.status,
+        paymentId: payment.id,
+        payer: payment.payer.email,
+        amount: payment.transaction_amount,
         updatedAt: admin.firestore.FieldValue.serverTimestamp(),
       },
       { merge: true }
