@@ -24,7 +24,7 @@ const db = admin.firestore();
 mercadopago.configure({
   access_token: process.env.MP_ACCESS_TOKEN,
 });
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
     res.json({
         message: "Bienvenido al servicio Mayikh Style"
     })
