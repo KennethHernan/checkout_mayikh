@@ -8,11 +8,15 @@
   ],
   "routes": [
     {
+      "src": "/",
+      "dest": "/api"
+    },
+    {
       "src": "/api/create_preference",
       "dest": "/api/index.js"
     },
     {
-      "src": "/webhook",
+      "src": "/api/webhook",
       "dest": "/api/index.js"
     }
   ]
