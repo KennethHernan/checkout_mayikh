@@ -71,6 +71,7 @@ app.post("/api/create_preference", async (req, res) => {
 
 app.post("/api/webhook", async (req, res) => {
   try {
+    console.log("Headers recibidos:", req.headers);
     const { type, data } = req.body;
     if (type !== "payment" || !data.id) return res.sendStatus(200);
 
