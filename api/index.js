@@ -30,7 +30,7 @@ app.get("/", (req, res) => {
     message: "Bienvenido al servicio Mayikh Style - Checkout",
   });
 });
-app.post("/create_preference", async (req, res) => {
+app.post("/api/create_preference", async (req, res) => {
   try {
     const { idOrder, items, userEmail } = req.body;
     if (!idOrder || !Array.isArray(items)) {
@@ -70,7 +70,7 @@ app.post("/create_preference", async (req, res) => {
   }
 });
 
-app.post("/webhook", async (req, res) => {
+app.post("/api/webhook", async (req, res) => {
   try {
     const parsedBody = JSON.parse(req.body);
     const { type, data } = parsedBody;
@@ -157,7 +157,7 @@ async function updatePaymentId(payment, status) {
   try {
     await ref.update({
       status: status,
-      idPayment: payment.id
+      idPayment: payment.id,
     });
     console.log("Payment ID actualizado correctamente.");
   } catch (error) {
@@ -165,8 +165,4 @@ async function updatePaymentId(payment, status) {
   }
 }
 
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
-});
-
-module.exports = app;
+export default app;
