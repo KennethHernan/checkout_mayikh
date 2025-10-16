@@ -1,12 +1,11 @@
-const express = require("express");
-const mercadopago = require("mercadopago");
-const cors = require("cors");
-const app = express();
-const admin = require("firebase-admin");
-const dotenv = require("dotenv");
-const PDFDocument = require("pdfkit");
-const fs = require("fs");
-const path = require("path");
+import express from "express";
+import mercadopago from "mercadopago";
+import cors from "cors";
+import admin from "firebase-admin";
+import dotenv from "dotenv";
+import PDFDocument from "pdfkit";
+import fs from "fs";
+import path from "path";
 
 dotenv.config();
 
