@@ -25,7 +25,7 @@ mercadopago.configure({
   access_token: process.env.MP_ACCESS_TOKEN,
 });
 
-app.get("/", (req, res) => {
+app.get("/api", (req, res) => {
   res.json({
     message: "Bienvenido al servicio Mayikh Style - Checkout",
   });
@@ -164,10 +164,6 @@ async function updatePaymentId(payment, status) {
     console.error("Error al actualizar el Payment ID:", error);
   }
 }
-
-app.listen(3000, () => {
-  console.log("Server is running on port 3000");
-});
 
 app.listen(3000, () => {
   console.log("Server is running on port 3000");
