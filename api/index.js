@@ -25,12 +25,12 @@ mercadopago.configure({
   access_token: process.env.MP_ACCESS_TOKEN,
 });
 
-app.get("/api", (req, res) => {
+app.get("/", (req, res) => {
   res.json({
     message: "Bienvenido al servicio Mayikh Style - Checkout",
   });
 });
-app.post("/api/create_preference", async (req, res) => {
+app.post("/create_preference", async (req, res) => {
   try {
     const { idOrder, items, userEmail } = req.body;
     if (!idOrder || !Array.isArray(items)) {
@@ -70,7 +70,7 @@ app.post("/api/create_preference", async (req, res) => {
   }
 });
 
-app.post("/api/webhook", async (req, res) => {
+app.post("/webhook", async (req, res) => {
   try {
     const parsedBody = JSON.parse(req.body);
     const { type, data } = parsedBody;
