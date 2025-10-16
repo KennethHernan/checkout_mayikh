@@ -8,8 +8,8 @@
   ],
   "routes": [
     {
-      "src": "/",
-      "dest": "/api"
+      "src": "",
+      "dest": "/"
     },
     {
       "src": "/api/create_preference",
