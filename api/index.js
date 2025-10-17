@@ -61,6 +61,9 @@ app.post("/api/create_preference", async (req, res) => {
         currency_id: "PEN",
       };
     });
+    console.log("mappedItems:");
+
+    console.log(mappedItems);
 
     const preference = {
       items: mappedItems,
@@ -76,13 +79,13 @@ app.post("/api/create_preference", async (req, res) => {
     };
 
     const response = await mercadopago.preferences.create(preference);
-    res.json({
+    return res.status(200).json({
       preferenceId: response.body.id,
       init_point: response.body.init_point,
     });
   } catch (error) {
     console.error("Error al crear preferencia:", error);
-    res.status(500).json({ error: "Error al crear preferencia" });
+    return res.status(500).json({ error: "Error al crear preferencia" });
   }
 });
 
