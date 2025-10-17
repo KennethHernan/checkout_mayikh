@@ -9,19 +9,18 @@ import path from "path";
 
 dotenv.config();
 
-app.use(cors());
+const app = express();
+app.use(
+  cors({
+    origin: [
+      "http://72.20.100.40:5173",
+      "https://mayikh.vercel.app",
+      "https://checkoutmk.vercel.app",
+    ],
+    methods: ["GET", "POST"],
+  })
+);
 app.use(express.json());
-
-app.use((req, res, next) => {
-  if (req.path === "/api/webhook") {
-    next();
-  } else {
-    cors({
-      origin: ["http://72.20.100.40:5173", "https://mayikh.vercel.app/"],
-      methods: ["GET", "POST"],
-    })(req, res, next);
-  }
-});
 
 if (!admin.apps.length) {
   const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
