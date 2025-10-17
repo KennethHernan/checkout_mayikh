@@ -47,7 +47,7 @@ app.post("/api/create_preference", async (req, res) => {
     }
 
     const mappedItems = items.map((data) => {
-      
+
       const price = Number(data.price);
       const discount = Number(data.discount) || 0;
       const finalPrice = price * (1 - discount / 100);
@@ -75,7 +75,7 @@ app.post("/api/create_preference", async (req, res) => {
         pending: `${process.env.PUBLIC_URL_PENDING}`,
       },
       auto_return: "approved",
-      notification_url: `${process.env.PUBLIC_URL_WEBHOOK}`,
+      //notification_url: `${process.env.PUBLIC_URL_WEBHOOK}`,
     };
 
     const response = await mercadopago.preferences.create(preference);
