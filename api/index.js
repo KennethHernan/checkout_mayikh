@@ -41,7 +41,7 @@ app.get("/", (req, res) => {
 });
 app.post("/api/create_preference", async (req, res) => {
   try {
-    const { idOrder, items, userEmail } = req.body;
+    const { idOrder, items, userEmail, delivery } = req.body;
     if (!idOrder || !Array.isArray(items)) {
       return res.status(400).json({ error: "Datos inválidos" });
     }
@@ -64,7 +64,7 @@ app.post("/api/create_preference", async (req, res) => {
     mappedItems.push({
       title: "Envío Delivery",
       description: "Costo deL ENVÍO ECOAMIGABLE",
-      unit_price: 10,
+      unit_price: delivery,
       quantity: 1,
       currency_id: "PEN",
     });
