@@ -47,7 +47,6 @@ app.post("/api/create_preference", async (req, res) => {
     }
 
     const mappedItems = items.map((data) => {
-
       const price = Number(data.price);
       const discount = Number(data.discount) || 0;
       const finalPrice = price * (1 - discount / 100);
@@ -61,9 +60,14 @@ app.post("/api/create_preference", async (req, res) => {
         currency_id: "PEN",
       };
     });
-    console.log("mappedItems:");
-
-    console.log(mappedItems);
+    // Agregar + precio delivery
+    mappedItems.push({
+      title: "Envío Delivery",
+      description: "Costo deL ENVÍO ECOAMIGABLE",
+      unit_price: 10,
+      quantity: 1,
+      currency_id: "PEN",
+    });
 
     const preference = {
       items: mappedItems,
