@@ -46,14 +46,21 @@ app.post("/api/create_preference", async (req, res) => {
       return res.status(400).json({ error: "Datos inválidos" });
     }
 
-    const mappedItems = items.map((item) => ({
-      title: item.nameP,
-      description: item.descriptionCar,
-      unit_price: Number(item.price),
-      quantity: Number(item.amount),
-      picture_url: item.urlP,
-      currency_id: "PEN",
-    }));
+    const mappedItems = items.map((item) => {
+      const data = item.items;
+      const price = Number(data.price);
+      const discount = Number(data.discount) || 0;
+      const finalPrice = price * (1 - discount / 100);
+
+      return {
+        title: data.nameP,
+        description: data.description,
+        unit_price: parseFloat(finalPrice.toFixed(2)),
+        quantity: Number(data.cantidad),
+        picture_url: data.urlP,
+        currency_id: "PEN",
+      };
+    });
 
     const preference = {
       items: mappedItems,
