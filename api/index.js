@@ -46,8 +46,8 @@ app.post("/api/create_preference", async (req, res) => {
       return res.status(400).json({ error: "Datos inválidos" });
     }
 
-    const mappedItems = items.map((item) => {
-      const data = item.items;
+    const mappedItems = items.map((data) => {
+      
       const price = Number(data.price);
       const discount = Number(data.discount) || 0;
       const finalPrice = price * (1 - discount / 100);
