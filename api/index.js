@@ -7,7 +7,7 @@ import PDFDocument from "pdfkit";
 import fs from "fs";
 import path from "path";
 
-dotenv.config();
+dotenv.config({ override: true });
 
 const app = express();
 app.use(
