@@ -44,7 +44,7 @@ app.get("/", (req, res) => {
 // https://checkoutmk.vercel.app/api/create_preference
 app.post("/api/create_preference", async (req, res) => {
   try {
-    const { idOrder, items, delivery, userData } = req.body;
+    const { idOrder, items, delivery, idSession } = req.body;
 
     if (!idOrder || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "Datos inválidos" });
@@ -83,9 +83,9 @@ app.post("/api/create_preference", async (req, res) => {
       items: mappedItems,
       external_reference: idOrder,
       back_urls: {
-        success: 'https://checkoutmk.vercel.app/success',
-        failure: 'https://checkoutmk.vercel.app/failure',
-        pending: 'https://checkoutmk.vercel.app/pending'
+        success: `https://mayikh.vercel.app/checkout/${idSession}/success`,
+        failure: `https://mayikh.vercel.app/checkout/${idSession}/failure`,
+        pending: `https://mayikh.vercel.app/checkout/${idSession}/pending`,
       },
       auto_return: "approved",
       external_reference: "",
