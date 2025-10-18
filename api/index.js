@@ -9,6 +9,8 @@ import path from "path";
 
 dotenv.config({ override: true });
 
+const now = new Date();
+const expirationDateTo = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 const app = express();
 app.use(
   cors({
@@ -89,8 +91,8 @@ app.post("/api/create_preference", async (req, res) => {
       notification_url: "https://checkoutmk.vercel.app/api/webhook",
       statement_descriptor: "MAYIKH STYLE",
       expires: true,
-      expiration_date_from: new Date().toISOString(),
-      expiration_date_to: new Date(Date.now() + 24 *60 *60 * 1000).toISOString()
+      expiration_date_from: now.toISOString().replace("Z", "-05:00"),
+      expiration_date_to: expirationDateTo.toISOString().replace("Z", "-05:00"),
     };
 
     const response = await mercadopago.preferences.create(preference);
