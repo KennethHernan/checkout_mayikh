@@ -81,7 +81,7 @@ app.post("/api/create_preference", async (req, res) => {
     const preference = {
       items: mappedItems,
       external_reference: idOrder,
-      back_url: {
+      back_urls: {
         success: 'https://checkoutmk.vercel.app/success',
         failure: 'https://checkoutmk.vercel.app/failure',
         pending: 'https://checkoutmk.vercel.app/pending'
