@@ -67,28 +67,29 @@ app.post("/api/create_preference", async (req, res) => {
     });
 
     // Validar delivery
-    const deliveryPrice = Number(delivery) > 0 ? Number(delivery) : 0.01;
-    mappedItems.push({
-      title: "Envío Delivery",
-      description: "Costo del envío ecoamigable",
-      unit_price: deliveryPrice,
-      quantity: 1,
-      currency_id: "PEN",
-    });
+    const deliveryPrice = Number(delivery);
+    if (delivery > 0) {
+      mappedItems.push({
+        title: "Envío Delivery",
+        description: "Costo del envío ecoamigable",
+        unit_price: deliveryPrice,
+        quantity: 1,
+        currency_id: "PEN",
+      });
+    }
 
     const now = new Date();
     const expirationDateTo = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
     const preference = {
       items: mappedItems,
-      external_reference: idOrder,
       back_urls: {
         success: `https://mayikh.vercel.app/checkout/${idSession}/success`,
         failure: `https://mayikh.vercel.app/checkout/${idSession}/failure`,
         pending: `https://mayikh.vercel.app/checkout/${idSession}/pending`,
       },
       auto_return: "approved",
-      external_reference: "",
+      external_reference: idOrder,
       notification_url: "https://checkoutmk.vercel.app/api/webhook",
       statement_descriptor: "MAYIKH STYLE",
       expires: true,
@@ -111,6 +112,7 @@ function formatDateWithOffset(date) {
   const iso = date.toISOString();
   return iso.replace("Z", "-05:00");
 }
+
 // https://checkoutmk.vercel.app/api/webhook
 app.post("/api/webhook", async (req, res) => {
   try {
