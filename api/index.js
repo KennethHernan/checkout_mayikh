@@ -92,8 +92,8 @@ app.post("/api/create_preference", async (req, res) => {
       notification_url: "https://checkoutmk.vercel.app/api/webhook",
       statement_descriptor: "MAYIKH STYLE",
       expires: true,
-      expiration_date_from: now.toISOString().replace("Z", "-05:00"),
-      expiration_date_to: expirationDateTo.toISOString().replace("Z", "-05:00"),
+      expiration_date_from: now.toISOString(),
+      expiration_date_to: expirationDateTo.toISOString(),
     };
 
     const response = await mercadopago.preferences.create(preference);
