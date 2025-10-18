@@ -9,8 +9,6 @@ import path from "path";
 
 dotenv.config({ override: true });
 
-const now = new Date();
-const expirationDateTo = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 const app = express();
 app.use(
   cors({
@@ -77,6 +75,9 @@ app.post("/api/create_preference", async (req, res) => {
       quantity: 1,
       currency_id: "PEN",
     });
+
+    const now = new Date();
+    const expirationDateTo = new Date(now.getTime() + 24 * 60 * 60 * 1000);
 
     const preference = {
       items: mappedItems,
@@ -153,21 +154,12 @@ app.post("/api/webhook", async (req, res) => {
   }
 });
 
-app.get("/success", (req, res) => {
-  res.json({
-    message: "MERCADO PAGO - success",
-  });
-});
-app.get("/failure", (req, res) => {
-  res.json({
-    message: "MERCADO PAGO - failure",
-  });
-});
-app.get("/pending", (req, res) => {
-  res.json({
-    message: "MERCADO PAGO - pending",
-  });
-});
+// === ENDPOINTS DE RESULTADOS ===
+app.get("/success", (req, res) => res.json({ message: "✅ Pago exitoso" }));
+app.get("/failure", (req, res) => res.json({ message: "❌ Pago fallido" }));
+app.get("/pending", (req, res) => res.json({ message: "⌛ Pago pendiente" }));
+
+
 // Generar boleta - PDF
 async function generarReciboPDF(payment) {
   const doc = new PDFDocument();
