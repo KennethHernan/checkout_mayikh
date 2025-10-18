@@ -6,7 +6,6 @@ import dotenv from "dotenv";
 import PDFDocument from "pdfkit";
 import fs from "fs";
 import path from "path";
-import { preferences } from "mercadopago";
 
 dotenv.config({ override: true });
 
