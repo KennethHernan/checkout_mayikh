@@ -93,6 +93,73 @@ app.post("/api/create_preference", async (req, res) => {
   }
 });
 
+app.post("/api/create_preference", async (req, res) => {
+  try {
+    const { idOrder, items, delivery, userData } = req.body;
+
+    if (!idOrder || !Array.isArray(items) || items.length === 0) {
+      return res.status(400).json({ error: "Datos inválidos" });
+    }
+
+    const mappedItems = items.map((data) => {
+      const price = Number(data.price);
+      const discount = Number(data.discount) || 0;
+      const finalPrice = price * (1 - discount / 100);
+
+      return {
+        title: data.nameP,
+        description: data.description || "Producto Mayikh",
+        unit_price: parseFloat(finalPrice.toFixed(2)),
+        quantity: Number(data.cantidad),
+        picture_url: data.urlP,
+        currency_id: "PEN",
+      };
+    });
+
+    // Validar delivery
+    const deliveryPrice = Number(delivery) > 0 ? Number(delivery) : 0.01;
+    mappedItems.push({
+      title: "Envío Delivery",
+      description: "Costo del envío ecoamigable",
+      unit_price: deliveryPrice,
+      quantity: 1,
+      currency_id: "PEN",
+    });
+
+    const preference = {
+      items: mappedItems,
+      external_reference: idOrder,
+      payer: {
+        email: userData?.email,
+        name: userData?.nombre,
+        surname: userData?.apellido,
+        identification: {
+          type: "DNI",
+          number: userData?.dni ,
+        },
+      },
+      back_urls: {
+        success: process.env.PUBLIC_URL_SUCCESS,
+        failure: process.env.PUBLIC_URL_FAILURE,
+        pending: process.env.PUBLIC_URL_PENDING,
+      },
+      auto_return: "approved",
+    };
+
+    const response = await mercadopago.preferences.create(preference);
+
+    return res.status(200).json({
+      preference: response,
+      preferenceId: response.body.id,
+      init_point: response.body.init_point,
+    });
+  } catch (error) {
+    console.error("Error al crear preferencia:", error);
+    return res.status(500).json({ error: "Error al crear preferencia" });
+  }
+});
+
+
 app.post("/api/webhook", async (req, res) => {
   try {
     const parsedBody = JSON.parse(req.body);
