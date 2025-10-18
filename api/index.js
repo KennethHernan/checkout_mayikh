@@ -92,8 +92,8 @@ app.post("/api/create_preference", async (req, res) => {
       notification_url: "https://checkoutmk.vercel.app/api/webhook",
       statement_descriptor: "MAYIKH STYLE",
       expires: true,
-      expiration_date_from: now.toISOString(),
-      expiration_date_to: expirationDateTo.toISOString(),
+      expiration_date_from: formatDateWithOffset(now),
+      expiration_date_to: formatDateWithOffset(expirationDateTo),
     };
 
     const response = await mercadopago.preferences.create(preference);
@@ -108,7 +108,10 @@ app.post("/api/create_preference", async (req, res) => {
     return res.status(500).json({ error: "Error al crear preferencia" });
   }
 });
-
+function formatDateWithOffset(date) {
+  const iso = date.toISOString();
+  return iso.replace("Z", "-05:00");
+}
 // https://checkoutmk.vercel.app/api/webhook
 app.post("/api/webhook", async (req, res) => {
   try {
