@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import PDFDocument from "pdfkit";
 import fs from "fs";
 import path from "path";
+import { preferences } from "mercadopago";
 
 dotenv.config({ override: true });
 
@@ -34,12 +35,14 @@ mercadopago.configure({
   access_token: process.env.MP_ACCESS_TOKEN,
 });
 
+// https://checkoutmk.vercel.app/
 app.get("/", (req, res) => {
   res.json({
     message: "Bienvenido al servicio Mayikh Style - Checkout",
   });
 });
 
+// https://checkoutmk.vercel.app/api/create_preference
 app.post("/api/create_preference", async (req, res) => {
   try {
     const { idOrder, items, delivery, userData } = req.body;
@@ -77,21 +80,18 @@ app.post("/api/create_preference", async (req, res) => {
     const preference = {
       items: mappedItems,
       external_reference: idOrder,
-      // payer: {
-      //   email: userData?.email,
-      //   name: userData?.nombre,
-      //   surname: userData?.apellido,
-      //   identification: {
-      //     type: "DNI",
-      //     number: userData?.dni,
-      //   },
-      // },
       back_url: {
-        success: '',
-        failure: '',
+        success: 'https://checkoutmk.vercel.app/success',
+        failure: 'https://checkoutmk.vercel.app/failure',
+        pending: 'https://checkoutmk.vercel.app/pending'
       },
-      // auto_return: "approved",
-      // notification_url: "https://checkoutmk.vercel.app/api/webhook"
+      auto_return: "approved",
+      external_reference: "",
+      notification_url: "https://checkoutmk.vercel.app/api/webhook",
+      statement_descriptor: "MAYIKH STYLE",
+      expires: true,
+      expiration_date_from: new Date().toISOString(),
+      expiration_date_to: new Date(Date.now() + 24 *60 *60 * 1000).toISOString()
     };
 
     const response = await mercadopago.preferences.create(preference);
@@ -107,7 +107,7 @@ app.post("/api/create_preference", async (req, res) => {
   }
 });
 
-
+// https://checkoutmk.vercel.app/api/webhook
 app.post("/api/webhook", async (req, res) => {
   try {
     const parsedBody = JSON.parse(req.body);
@@ -152,6 +152,21 @@ app.post("/api/webhook", async (req, res) => {
   }
 });
 
+app.get("/success", (req, res) => {
+  res.json({
+    message: "MERCADO PAGO - success",
+  });
+});
+app.get("/failure", (req, res) => {
+  res.json({
+    message: "MERCADO PAGO - failure",
+  });
+});
+app.get("/pending", (req, res) => {
+  res.json({
+    message: "MERCADO PAGO - pending",
+  });
+});
 // Generar boleta - PDF
 async function generarReciboPDF(payment) {
   const doc = new PDFDocument();
