@@ -43,7 +43,7 @@ app.get("/", (req, res) => {
 app.post("/api/create_preference", async (req, res) => {
   try {
     const { idOrder, items, delivery, userData } = req.body;
-    
+
     if (!idOrder || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "Datos inválidos" });
     }
@@ -77,21 +77,21 @@ app.post("/api/create_preference", async (req, res) => {
     const preference = {
       items: mappedItems,
       external_reference: idOrder,
-      payer: {
-        email: userData?.email,
-        name: userData?.nombre,
-        surname: userData?.apellido,
-        identification: {
-          type: "DNI",
-          number: userData?.dni ,
-        },
+      // payer: {
+      //   email: userData?.email,
+      //   name: userData?.nombre,
+      //   surname: userData?.apellido,
+      //   identification: {
+      //     type: "DNI",
+      //     number: userData?.dni,
+      //   },
+      // },
+      back_url: {
+        success: '',
+        failure: '',
       },
-      back_urls: {
-        success: process.env.PUBLIC_URL_SUCCESS,
-        failure: process.env.PUBLIC_URL_FAILURE,
-        pending: process.env.PUBLIC_URL_PENDING,
-      },
-      auto_return: "approved",
+      // auto_return: "approved",
+      // notification_url: "https://checkoutmk.vercel.app/api/webhook"
     };
 
     const response = await mercadopago.preferences.create(preference);
