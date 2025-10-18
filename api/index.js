@@ -39,72 +39,16 @@ app.get("/", (req, res) => {
     message: "Bienvenido al servicio Mayikh Style - Checkout",
   });
 });
-app.post("/api/create_preference", async (req, res) => {
-  try {
-    const { idOrder, items, userEmail, delivery } = req.body;
-    if (!idOrder || !Array.isArray(items)) {
-      return res.status(400).json({ error: "Datos inválidos" });
-    }
-
-    const mappedItems = items.map((data) => {
-      const price = Number(data.price);
-      const discount = Number(data.discount) || 0;
-      const finalPrice = price * (1 - discount / 100);
-
-      return {
-        title: data.nameP,
-        description: data.description,
-        unit_price: parseFloat(finalPrice.toFixed(2)),
-        quantity: Number(data.cantidad),
-        picture_url: data.urlP,
-        currency_id: "PEN",
-      };
-    });
-    // Agregar + precio delivery
-    mappedItems.push({
-      title: "Envío Delivery",
-      description: "Costo deL ENVÍO ECOAMIGABLE",
-      unit_price: delivery,
-      quantity: 1,
-      currency_id: "PEN",
-    });
-
-    const preference = {
-      items: mappedItems,
-      external_reference: idOrder,
-      payer: { email: userEmail || "cliente@mayikh.com" },
-      back_urls: {
-        success: `${process.env.PUBLIC_URL_SUCCESS}`,
-        failure: `${process.env.PUBLIC_URL_FAILURE}`,
-        pending: `${process.env.PUBLIC_URL_PENDING}`,
-      },
-      auto_return: "approved",
-    };
-
-    const response = await mercadopago.preferences.create(preference);
-    return res.status(200).json({
-      preference: response,
-      preferenceId: response.body.id,
-      init_point: response.body.init_point,
-    });
-  } catch (error) {
-    console.error("Error al crear preferencia:", error);
-    return res.status(500).json({ error: "Error al crear preferencia" });
-  }
-});
 
 app.post("/api/create_preference", async (req, res) => {
   try {
     const { idOrder, items, delivery, userData } = req.body;
-
-    console.log("userData:");
     
-    console.log(userData);
-    
-    if (!idOrder || !Array.isArray(items) || items.length === 0) {
+    if (!idOrder || !Array.isArray(items) || items.length === 0 || !Array.isArray(userData)) {
       return res.status(400).json({ error: "Datos inválidos" });
     }
 
+    // Mapeador de Carrito
     const mappedItems = items.map((data) => {
       const price = Number(data.price);
       const discount = Number(data.discount) || 0;
