@@ -92,7 +92,6 @@ app.post("/api/create_preference", async (req, res) => {
       notification_url: "https://checkoutmk.vercel.app/api/webhook",
       statement_descriptor: "MAYIKH STYLE",
       expires: true,
-      expiration_date_from: formatDateWithOffset(now),
       expiration_date_to: formatDateWithOffset(expirationDateTo),
     };
 
