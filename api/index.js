@@ -97,6 +97,10 @@ app.post("/api/create_preference", async (req, res) => {
   try {
     const { idOrder, items, delivery, userData } = req.body;
 
+    console.log("userData:");
+    
+    console.log(userData);
+    
     if (!idOrder || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "Datos inválidos" });
     }
