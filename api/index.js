@@ -177,10 +177,6 @@ app.post("/api/webhook", async (req, res) => {
   }
 });
 
-// === ENDPOINTS DE RESULTADOS ===
-app.get("/success", (req, res) => res.json({ message: "✅ Pago exitoso" }));
-app.get("/failure", (req, res) => res.json({ message: "❌ Pago fallido" }));
-app.get("/pending", (req, res) => res.json({ message: "⌛ Pago pendiente" }));
 
 // Generar boleta - PDF
 async function generarReciboPDF(payment) {
