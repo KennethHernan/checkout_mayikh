@@ -44,7 +44,7 @@ app.get("/", (req, res) => {
 // https://checkoutmk.vercel.app/api/create_preference
 app.post("/api/create_preference", async (req, res) => {
   try {
-    const { idOrder, items, delivery, idSession } = req.body;
+    const { idOrder, items, delivery, idSession, userData } = req.body;
 
     if (!idOrder || !Array.isArray(items) || items.length === 0) {
       return res.status(400).json({ error: "Datos inválidos" });
@@ -57,12 +57,14 @@ app.post("/api/create_preference", async (req, res) => {
       const finalPrice = price * (1 - discount / 100);
 
       return {
+        id: data.idProduct,
         title: data.nameP,
-        description: data.description || "Producto Mayikh",
+        description: data.description,
         unit_price: parseFloat(finalPrice.toFixed(2)),
         quantity: Number(data.cantidad),
         picture_url: data.urlP,
         currency_id: "PEN",
+        category_id: data.idCategory,
       };
     });
 
@@ -75,6 +77,7 @@ app.post("/api/create_preference", async (req, res) => {
         unit_price: deliveryPrice,
         quantity: 1,
         currency_id: "PEN",
+        category_id: "",
       });
     }
 
@@ -83,6 +86,22 @@ app.post("/api/create_preference", async (req, res) => {
 
     const preference = {
       items: mappedItems,
+      payer: {
+        name: userData.nombre,
+        surname: userData.apellido,
+        email: userData.email,
+        phone: {
+          area_code: "51",
+          number: userData.phone,
+        },
+        identification: {
+          type: "DNI",
+          number: userData.dni,
+        },
+        address: {
+          street_name: userData.direccion
+        },
+      },
       back_urls: {
         success: `https://mayikh.vercel.app/checkout/${idSession}/success`,
         failure: `https://mayikh.vercel.app/checkout/${idSession}/failure`,
@@ -162,7 +181,6 @@ app.post("/api/webhook", async (req, res) => {
 app.get("/success", (req, res) => res.json({ message: "✅ Pago exitoso" }));
 app.get("/failure", (req, res) => res.json({ message: "❌ Pago fallido" }));
 app.get("/pending", (req, res) => res.json({ message: "⌛ Pago pendiente" }));
-
 
 // Generar boleta - PDF
 async function generarReciboPDF(payment) {
