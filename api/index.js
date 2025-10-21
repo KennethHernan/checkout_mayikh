@@ -8,6 +8,10 @@ import fs from "fs";
 import path from "path";
 import fetch from "node-fetch";
 
+import nodemailer from "nodemailer";
+import { render } from "@react-email/render";
+import VerifyEmail from "./emailCode";
+import crypto from "crypto";
 dotenv.config({ override: true });
 
 const app = express();
@@ -200,6 +204,40 @@ app.post("/api/webhook", async (req, res) => {
   }
 });
 
+app.post("/api/enviar-code", async (req, res) => {
+  const { email } = req.body;
+
+  if (!email || typeof email !== "string") {
+    return res.status(400).json({ ok: false, message: "Email is required" });
+  }
+
+  const code = generate6DigitCodeAlt();
+  const emailHtml = render(<VerifyEmail verificationCode={code} />);
+
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.GMAIL_USER,
+      pass: process.env.GMAIL_PASS,
+    },
+  });
+
+  try {
+    await transporter.sendMail({
+      from: `"MAYIKH" <${process.env.GMAIL_USER}>`,
+      to: email,
+      subject: "Verifica tu correo",
+      html: emailHtml,
+    });
+
+    return res.status(200).json({ ok: true, code });
+  } catch (error) {
+    console.error("Error sending email:", error);
+    return res.status(500).json({ ok: false, message: error.message || "Error interno" });
+  }
+});
 // Generar boleta - PDF
 async function generarReciboPDF(payment) {
   const doc = new PDFDocument();
@@ -235,6 +273,13 @@ async function generarReciboPDF(payment) {
 
   return filePath;
 }
+
+function generate6DigitCodeAlt() {
+  const buf = crypto.randomBytes(4);
+  const num = buf.readUInt32BE(0) % 1000000;
+  return num.toString().padStart(6, "0");
+}
+
 
 // Funcion para Actualziar Order
 async function updatePaymentId(payment, status) {
