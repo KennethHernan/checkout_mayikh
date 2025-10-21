@@ -96,7 +96,7 @@ app.post("/api/create_preference", async (req, res) => {
         },
         identification: {
           type: "DNI",
-          number: Number(userData.dni),
+          number: userData.dni,
         },
         address: {
           street_name: userData.direccion
