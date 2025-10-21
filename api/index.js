@@ -92,11 +92,11 @@ app.post("/api/create_preference", async (req, res) => {
         email: userData.email,
         phone: {
           area_code: "51",
-          number: userData.phone,
+          number: Number(userData.phone),
         },
         identification: {
           type: "DNI",
-          number: userData.dni,
+          number: Number(userData.dni),
         },
         address: {
           street_name: userData.direccion
