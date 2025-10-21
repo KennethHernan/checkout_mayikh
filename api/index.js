@@ -175,8 +175,8 @@ function formatDateWithOffset(date) {
 // https://checkoutmk.vercel.app/api/webhook
 app.post("/api/webhook", async (req, res) => {
   try {
-    const parsedBody = JSON.parse(req.body);
-    const { type, data } = parsedBody;
+    //const parsedBody = JSON.parse(req.body);
+    const { type, data } = req.body;
 
     if (type !== "payment" || !data.id || isNaN(Number(data.id))) {
       console.warn("Evento ignorado o ID inválido");
