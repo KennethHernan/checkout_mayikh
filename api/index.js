@@ -174,39 +174,29 @@ function formatDateWithOffset(date) {
 
 // https://checkoutmk.vercel.app/api/webhook
 app.post("/api/webhook", async (req, res) => {
-  try {
-    //const parsedBody = JSON.parse(req.body);
-    const { type, data } = req.body;
+  const { type, data } = req.body;
 
-    if (type !== "payment" || !data.id || isNaN(Number(data.id))) {
-      console.warn("Evento ignorado o ID inválido");
+  if (type !== "payment" || !data.id || isNaN(Number(data.id))) {
+    console.warn("Evento ignorado o ID inválido");
+    return res.sendStatus(200);
+  }
+
+  try {
+    const paymentResponse = await mercadopago.payment.findById(data.id);
+    const payment = paymentResponse.body;
+
+    const status = payment.status;
+    await updatePaymentId(payment, status);
+
+    return res.sendStatus(200);
+  } catch (error) {
+    if (error.status === 404) {
+      console.warn("Webhook recibido, pero el pago aún no está disponible. ID:", data.id);
       return res.sendStatus(200);
     }
 
-    let payment;
-    let status;
-    try {
-      const result = await mercadopago.payment
-        .findById(data.id)
-        .then(async (paymentResponse) => {
-          status = paymentResponse.body.status;
-          res.status(200).send("OK");
-        })
-        .catch((error) => {
-          console.error("Error al recibir el webhook:", error);
-          res.status(500).send("Error al recibir el webhook");
-        });
-      payment = result.body;
-      // Actualizar Order
-      await updatePaymentId(payment, status);
-    } catch (err) {
-      console.warn("No se encontró el pago con ID:", data.id);
-      return res.status(200).send("Pago no encontrado, ignorado");
-    }
-    res.sendStatus(200);
-  } catch (error) {
-    console.error("Error en webhook:", error);
-    res.sendStatus(500);
+    console.error("Error inesperado en el webhook:", error);
+    return res.sendStatus(500);
   }
 });
 
