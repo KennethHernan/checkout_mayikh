@@ -6,6 +6,7 @@ import dotenv from "dotenv";
 import PDFDocument from "pdfkit";
 import fs from "fs";
 import path from "path";
+import fetch from "node-fetch";
 
 dotenv.config({ override: true });
 
@@ -99,7 +100,7 @@ app.post("/api/create_preference", async (req, res) => {
           number: userData.dni,
         },
         address: {
-          street_name: userData.direccion
+          street_name: userData.direccion,
         },
       },
       back_urls: {
@@ -127,6 +128,45 @@ app.post("/api/create_preference", async (req, res) => {
     return res.status(500).json({ error: "Error al crear preferencia" });
   }
 });
+
+// https://checkoutmk.vercel.app/api/verify-payment
+app.get("/verify-payment", async (req, res) => {
+  const { paymentId } = req.body;
+
+  if (!paymentId) {
+    return res.status(400).json({ error: "payment_id requerido" });
+  }
+
+  try {
+    const response = await fetch(
+      `${process.env.ACCESS_MERCADOPAGO}/${paymentId}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: Bearer`${process.env.MP_ACCESS_TOKEN}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      return res.status(response.status).json({ error: error.message });
+    }
+
+    const paymentData = await response.json();
+
+    return res.status(200).json({
+      id: paymentData.id,
+      status: paymentData.status,
+      status_detail: paymentData.status_detail,
+      amount: paymentData.transaction_amount,
+      payer_email: paymentData.payer.email,
+    });
+  } catch (error) {
+    return res.status(500).json({ error: "Error al verificar el pago" });
+  }
+});
+
 function formatDateWithOffset(date) {
   const iso = date.toISOString();
   return iso.replace("Z", "-05:00");
@@ -150,13 +190,6 @@ app.post("/api/webhook", async (req, res) => {
         .findById(data.id)
         .then(async (paymentResponse) => {
           status = paymentResponse.body.status;
-          if (status === "approved") {
-            console.log("Pago Exitoso");
-          } else if (status === "pending") {
-            console.log("Pago pendiente");
-          } else if (status === "rejected") {
-            console.log("Pago rechazado");
-          }
           res.status(200).send("OK");
         })
         .catch((error) => {
@@ -176,7 +209,6 @@ app.post("/api/webhook", async (req, res) => {
     res.sendStatus(500);
   }
 });
-
 
 // Generar boleta - PDF
 async function generarReciboPDF(payment) {
