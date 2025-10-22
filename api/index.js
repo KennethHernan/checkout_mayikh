@@ -10,7 +10,7 @@ import fetch from "node-fetch";
 
 import nodemailer from "nodemailer";
 import { render } from "@react-email/render";
-import VerifyEmail from "./emailCode";
+import VerifyEmail from "./emailCode.js";
 import crypto from "crypto";
 dotenv.config({ override: true });
 
