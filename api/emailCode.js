@@ -1,7 +1,7 @@
-const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "";
+const baseUrl = process.env.URL_FRONTED;
 
 export default function VerifyEmail({ verificationCode }) {
-  const logoUrl = `${baseUrl}/static/mayikh-logo.png`;
+  const logoUrl = `${baseUrl}/assets/mayikh-logo.png`;
   return `
   <!doctype html>
   <html>

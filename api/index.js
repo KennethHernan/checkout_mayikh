@@ -26,6 +26,14 @@ app.use(
 );
 app.use(express.json());
 
+// Serve static files from /static so images like /static/mayikh-logo.png are public
+// In production (Vercel) static files are usually served from a `public/` folder automatically,
+// but when running Express locally this middleware exposes the folder.
+const staticDir = path.join(process.cwd(), "static");
+if (fs.existsSync(staticDir)) {
+  app.use("/static", express.static(staticDir));
+}
+
 if (!admin.apps.length) {
   const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT_KEY);
   admin.initializeApp({
@@ -194,7 +202,10 @@ app.post("/api/webhook", async (req, res) => {
     return res.sendStatus(200);
   } catch (error) {
     if (error.status === 404) {
-      console.warn("Webhook recibido, pero el pago aún no está disponible. ID:", data.id);
+      console.warn(
+        "Webhook recibido, pero el pago aún no está disponible. ID:",
+        data.id
+      );
       return res.sendStatus(200);
     }
 
@@ -217,12 +228,12 @@ app.post("/api/enviar-code", async (req, res) => {
     return res.status(200).json({ ok: true, code });
   } catch (error) {
     console.error("Error sending email:", error);
-    return res.status(500).json({ ok: false, message: error.message || "Error interno" });
+    return res
+      .status(500)
+      .json({ ok: false, message: error.message || "Error interno" });
   }
 });
 
-// --- Email helper (reusable) -------------------------------------------------
-// Create a single transporter instance (singleton) so connections are reused.
 let transporterInstance = null;
 
 function getTransporter() {
@@ -232,7 +243,9 @@ function getTransporter() {
   const pass = process.env.GMAIL_PASS;
 
   if (!user || !pass) {
-    throw new Error("GMAIL_USER and GMAIL_PASS environment variables are required for sending email");
+    throw new Error(
+      "GMAIL_USER and GMAIL_PASS environment variables are required for sending email"
+    );
   }
 
   transporterInstance = nodemailer.createTransport({
@@ -248,14 +261,9 @@ function getTransporter() {
   return transporterInstance;
 }
 
-/**
- * sendVerificationEmail
- * - to: recipient email
- * - code: verification code string
- * Returns a Promise that resolves when the message is sent.
- */
 async function sendVerificationEmail(to, code) {
-  if (!to || typeof to !== "string") throw new Error("Recipient email required");
+  if (!to || typeof to !== "string")
+    throw new Error("Recipient email required");
 
   const html = VerifyEmail({ verificationCode: code });
 
@@ -312,7 +320,6 @@ function generate6DigitCodeAlt() {
   const num = buf.readUInt32BE(0) % 1000000;
   return num.toString().padStart(6, "0");
 }
-
 
 // Funcion para Actualziar Order
 async function updatePaymentId(payment, status) {
