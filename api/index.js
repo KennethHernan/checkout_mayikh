@@ -9,7 +9,6 @@ import path from "path";
 import fetch from "node-fetch";
 
 import nodemailer from "nodemailer";
-import { render } from "@react-email/render";
 import VerifyEmail from "./emailCode.js";
 import crypto from "crypto";
 dotenv.config({ override: true });
@@ -258,7 +257,7 @@ function getTransporter() {
 async function sendVerificationEmail(to, code) {
   if (!to || typeof to !== "string") throw new Error("Recipient email required");
 
-  const html = render(/* React element */ VerifyEmail({ verificationCode: code }));
+  const html = VerifyEmail({ verificationCode: code });
 
   const transporter = getTransporter();
 

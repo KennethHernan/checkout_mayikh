@@ -1,171 +1,36 @@
-import { createElement } from "react";
-import { Html, Head, Body, Container, Section, Img, Heading, Text, Hr, Link, Preview } from "@react-email/components";
+const baseUrl = process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "";
 
-const baseUrl = process.env.VERCEL_URL
-  ? `https://${process.env.VERCEL_URL}`
-  : "";
-
-function VerifyEmail({ verificationCode }) {
-  return createElement(
-    Html,
-    null,
-    createElement(Head, null),
-    createElement(
-      Body,
-      { style: main },
-      createElement(Preview, null, "AWS Email Verification"),
-      createElement(
-        Container,
-        { style: container },
-        createElement(
-          Section,
-          { style: coverSection },
-          createElement(
-            Section,
-            { style: imageSection },
-            createElement(Img, {
-              src: `${baseUrl}/static/aws-logo.png`,
-              width: "75",
-              height: "45",
-              alt: "AWS's Logo",
-            })
-          ),
-          createElement(
-            Section,
-            { style: upperSection },
-            createElement(Heading, { style: h1 }, "Verify your email address"),
-            createElement(
-              Text,
-              { style: mainText },
-              "Thanks for starting the new AWS account creation process. We want to make sure it's really you. Please enter the following verification code when prompted. If you don't want to create an account, you can ignore this message."
-            ),
-            createElement(
-              Section,
-              { style: verificationSection },
-              createElement(Text, { style: verifyText }, "Verification code"),
-              createElement(Text, { style: codeText }, verificationCode),
-              createElement(Text, { style: validityText }, "(This code is valid for 10 minutes)")
-            )
-          ),
-          createElement(Hr, null),
-          createElement(
-            Section,
-            { style: lowerSection },
-            createElement(
-              Text,
-              { style: cautionText },
-              "Amazon Web Services will never email you and ask you to disclose or verify your password, credit card, or banking account number."
-            )
-          )
-        ),
-        createElement(
-          Text,
-          { style: footerText },
-          "This message was produced and distributed by Amazon Web Services, Inc., 410 Terry Ave. North, Seattle, WA 98109. © 2022, Amazon Web Services, Inc.. All rights reserved. AWS is a registered trademark of ",
-          createElement(
-            Link,
-            { href: "https://amazon.com", target: "_blank", style: link },
-            "Amazon.com"
-          ),
-          ", Inc. View our ",
-          createElement(
-            Link,
-            { href: "https://amazon.com", target: "_blank", style: link },
-            "privacy policy"
-          ),
-          "."
-        )
-      )
-    )
-  );
+export default function VerifyEmail({ verificationCode }) {
+  const logoUrl = `${baseUrl}/static/mayikh-logo.png`;
+  return `
+  <!doctype html>
+  <html>
+    <head>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width,initial-scale=1" />
+      <title>Verify your email</title>
+    </head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif; background:#fff; color:#212121; margin:0; padding:20px;">
+      <div style="max-width:600px; margin:0 auto; background:#eee; padding:20px;">
+        <div style="background:#fff; padding:25px 35px;">
+          <div style="text-align:center; padding-bottom:14px;">
+            <img src="${logoUrl}" width="75" height="45" alt="logo" style="display:inline-block;" />
+          </div>
+          <h1 style="font-size:20px; color:#333; margin:0 0 15px;">Verify your email address</h1>
+          <p style="font-size:14px; color:#333; margin-bottom:14px;">Thanks for starting the new account creation process. Please enter the following verification code when prompted. If you don't want to create an account, you can ignore this message.</p>
+          <div style="text-align:center; margin:20px 0;">
+            <div style="font-weight:bold; margin-bottom:8px;">Verification code</div>
+            <div style="font-weight:bold; font-size:36px;">${verificationCode}</div>
+            <div style="font-size:12px; color:#666;">(This code is valid for 10 minutes)</div>
+          </div>
+          <hr />
+          <p style="font-size:12px; color:#666;">Amazon Web Services will never email you and ask you to disclose or verify your password, credit card, or banking account number.</p>
+        </div>
+        <p style="font-size:12px; color:#666; padding:10px 20px;">This message was produced and distributed by Amazon Web Services, Inc., 410 Terry Ave. North, Seattle, WA 98109. © 2022, Amazon Web Services, Inc.. All rights reserved. View our <a href="https://amazon.com" target="_blank">privacy policy</a>.</p>
+      </div>
+    </body>
+  </html>
+  `;
 }
 
-export default VerifyEmail;
-
-// Estilos (igual que antes, sin TypeScript)
-const main = {
-  backgroundColor: "#fff",
-  color: "#212121",
-};
-
-const container = {
-  padding: "20px",
-  margin: "0 auto",
-  backgroundColor: "#eee",
-};
-
-const h1 = {
-  color: "#333",
-  fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
-  fontSize: "20px",
-  fontWeight: "bold",
-  marginBottom: "15px",
-};
-
-const link = {
-  color: "#2754C5",
-  fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
-  fontSize: "14px",
-  textDecoration: "underline",
-};
-
-const text = {
-  color: "#333",
-  fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
-  fontSize: "14px",
-  margin: "24px 0",
-};
-
-const imageSection = {
-  backgroundColor: "#252f3d",
-  display: "flex",
-  padding: "20px 0",
-  alignItems: "center",
-  justifyContent: "center",
-};
-
-const coverSection = { backgroundColor: "#fff" };
-
-const upperSection = { padding: "25px 35px" };
-
-const lowerSection = { padding: "25px 35px" };
-
-const footerText = {
-  ...text,
-  fontSize: "12px",
-  padding: "0 20px",
-};
-
-const verifyText = {
-  ...text,
-  margin: 0,
-  fontWeight: "bold",
-  textAlign: "center",
-};
-
-const codeText = {
-  ...text,
-  fontWeight: "bold",
-  fontSize: "36px",
-  margin: "10px 0",
-  textAlign: "center",
-};
-
-const validityText = {
-  ...text,
-  margin: "0px",
-  textAlign: "center",
-};
-
-const verificationSection = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-};
-
-const mainText = { ...text, marginBottom: "14px" };
-
-const cautionText = { ...text, margin: "0px" };
+// estilos ya integrados en la plantilla HTML estática
