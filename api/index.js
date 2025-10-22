@@ -204,6 +204,7 @@ app.post("/api/webhook", async (req, res) => {
   }
 });
 
+// https://checkoutmk.vercel.app/api/enviar-code
 app.post("/api/enviar-code", async (req, res) => {
   const { email } = req.body;
 
@@ -212,32 +213,65 @@ app.post("/api/enviar-code", async (req, res) => {
   }
 
   const code = generate6DigitCodeAlt();
-  const emailHtml = render(<VerifyEmail verificationCode={code} />);
-
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_PASS,
-    },
-  });
-
   try {
-    await transporter.sendMail({
-      from: `"MAYIKH" <${process.env.GMAIL_USER}>`,
-      to: email,
-      subject: "Verifica tu correo",
-      html: emailHtml,
-    });
-
+    await sendVerificationEmail(email, code);
     return res.status(200).json({ ok: true, code });
   } catch (error) {
     console.error("Error sending email:", error);
     return res.status(500).json({ ok: false, message: error.message || "Error interno" });
   }
 });
+
+// --- Email helper (reusable) -------------------------------------------------
+// Create a single transporter instance (singleton) so connections are reused.
+let transporterInstance = null;
+
+function getTransporter() {
+  if (transporterInstance) return transporterInstance;
+
+  const user = process.env.GMAIL_USER;
+  const pass = process.env.GMAIL_PASS;
+
+  if (!user || !pass) {
+    throw new Error("GMAIL_USER and GMAIL_PASS environment variables are required for sending email");
+  }
+
+  transporterInstance = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user,
+      pass,
+    },
+  });
+
+  return transporterInstance;
+}
+
+/**
+ * sendVerificationEmail
+ * - to: recipient email
+ * - code: verification code string
+ * Returns a Promise that resolves when the message is sent.
+ */
+async function sendVerificationEmail(to, code) {
+  if (!to || typeof to !== "string") throw new Error("Recipient email required");
+
+  const html = render(/* React element */ VerifyEmail({ verificationCode: code }));
+
+  const transporter = getTransporter();
+
+  const mailOptions = {
+    from: `"MAYIKH" <${process.env.GMAIL_USER}>`,
+    to,
+    subject: "Verifica tu correo",
+    html,
+  };
+
+  return transporter.sendMail(mailOptions);
+}
+
 // Generar boleta - PDF
 async function generarReciboPDF(payment) {
   const doc = new PDFDocument();
